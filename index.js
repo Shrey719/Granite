@@ -2,21 +2,19 @@ import express from "express";
 import { createServer } from "node:http";
 import { hostname } from "node:os";
 import csfetch from "./lib/fetch.js";
+import $gr from "./lib/config.js";
+import rewrite from "./lib/rewriter.js"
 
-function rewrite(text) {
-  return text.substring(1, text.length-1);
-}
 const app = express();
 app.use(express.static("public"));
-app.get("/fetch", (req, res) => {
+app.get($gr.prefix, (req, res) => {
   const query = req.query.q;
 
   csfetch(query, (error, result) => {
     if (error) {
       console.error(error);
     } else {
-      let rewrittenstuff = rewrite(result)
-      res.send(rewrittenstuff);
+      res.send(rewrite(result, query));
     }
   });
 });
